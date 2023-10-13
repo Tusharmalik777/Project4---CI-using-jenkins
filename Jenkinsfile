@@ -20,6 +20,23 @@ pipeline{
             steps{
                 sh "mvn -s settings.xml -DdkipTests install"
             }
+            post {
+                success {
+                    echo "Now Archiving"
+                    archiveArtifacts artifacts: '**/*.war'
+                }
+            }
         }
+        stage('test'){
+            steps{
+                sh 'mvn test'
+            }
+        }
+        stage('Checkstyle analysis') {
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }
+        
     }
 }
