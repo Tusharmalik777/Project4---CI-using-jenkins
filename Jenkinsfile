@@ -29,7 +29,7 @@ pipeline{
                 }
             }
         }
-        
+
         stage('test'){
             steps{
                 sh 'mvn -s settings.xml test'
@@ -55,6 +55,25 @@ pipeline{
                    -Dsonar.jacoco.reportsPath=target/jacoco.exec \
                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
               }
+            }
+        }
+        stage('Artifact upload'){
+            steps{
+                    nexusArtifactUploader(
+                        nexusVersion: 'nexus3',
+                        protocol: 'http',
+                        nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                        groupId: 'AQ',
+                        version: "${env.BUILD_ID}:${env.BUILD_TIMESTAMP}",
+                        repository: "${RELEASE_REPO}",
+                        credentialsId: "${NEXUS_LOGIN}",
+                        artifacts: [
+                            [artifactId: 'vproapp',
+                            classifier: '',
+                            file: 'target/vprofile-v2.war',
+                            type: 'war']
+                        ]
+                    )
             }
         }
     }
